@@ -129,9 +129,9 @@ class SignupCodeManager(models.Manager):
 
         return signup_code
 
-    def set_user_is_verified(self, code):
+    def set_user_is_verified(self, email, code):
         try:
-            signup_code = SignupCode.objects.get(code=code)
+            signup_code = SignupCode.objects.get(user__email=email, code=code)
             signup_code.user.is_verified = True
             signup_code.user.save()
             return True

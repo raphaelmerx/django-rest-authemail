@@ -97,8 +97,9 @@ class SignupVerify(APIView):
     permission_classes = (AllowAny,)
 
     def get(self, request, format=None):
+        email = request.GET.get("email", "")
         code = request.GET.get("code", "")
-        verified = SignupCode.objects.set_user_is_verified(code)
+        verified = SignupCode.objects.set_user_is_verified(email, code)
 
         if verified:
             try:
