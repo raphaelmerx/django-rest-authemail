@@ -10,6 +10,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.core.mail import send_mail
+from django.contrib.auth import get_user_model
 
 # Make part of the model eventually, so it can be edited
 EXPIRY_PERIOD = 3  # days
@@ -42,7 +43,7 @@ class EmailUserManager(BaseUserManager):
             is_verified=is_verified,
             last_login=now,
             date_joined=now,
-            **extra_fields
+            **extra_fields,
         )
         user.set_password(password)
         user.save(using=self._db)
@@ -130,6 +131,9 @@ class SignupCodeManager(models.Manager):
         return signup_code
 
     def set_user_is_verified(self, email, code):
+        user = get_user_model().objects.get(email=email)
+        if user.is_verified:
+            return True
         try:
             signup_code = SignupCode.objects.get(user__email=email, code=code)
             signup_code.user.is_verified = True
